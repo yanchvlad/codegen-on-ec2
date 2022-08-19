@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from model import code_model
 
 app = Flask(__name__)
 
@@ -9,11 +9,7 @@ def handle_post():
 
     if request.method == 'POST':
         text = request.form['input']
-        tokenizer = AutoTokenizer.from_pretrained("Salesforce/codegen-350M-multi")
-        model = AutoModelForCausalLM.from_pretrained("Salesforce/codegen-350M-multi")
-        input_ids = tokenizer(text, return_tensors="pt").input_ids
-        generated_ids = model.generate(input_ids, max_length=128)
-        output = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
+        output = code_model(text)
         print(output)
         return render_template('codegen.html', input=text, output=output)
     
@@ -26,4 +22,4 @@ def health():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0',port=80)
+    app.run(debug=True)
